@@ -14,7 +14,7 @@ from prompt_generator import MusicPrompt
 
 log = logging.getLogger(__name__)
 
-SITE_PATH = Path(__file__).parent.parent / "kairos.html"
+SITE_PATH = Path(__file__).parent.parent / "index.html"
 MANIFEST_PATH = Path(__file__).parent.parent / "tracks.json"
 
 
