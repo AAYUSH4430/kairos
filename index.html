@@ -938,10 +938,209 @@
     transform: translate(-50%, -50%);
     transition: left 0.1s, top 0.1s;
   }
+
+  /* ── BOOT SCREEN ── */
+  #boot-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Share Tech Mono', monospace;
+    transition: opacity 0.6s ease;
+  }
+  #boot-screen.hidden { opacity: 0; pointer-events: none; }
+
+  .boot-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 15vw, 140px);
+    letter-spacing: 12px;
+    color: var(--white);
+    text-shadow: 0 0 40px var(--red), 0 0 80px rgba(192,21,42,0.3);
+    margin-bottom: 40px;
+    animation: boot-flicker 0.1s steps(1) 3;
+  }
+
+  @keyframes boot-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .boot-lines {
+    width: min(500px, 90vw);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--red);
+    line-height: 2;
+  }
+
+  .boot-line {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .boot-line.show { opacity: 1; transform: translateX(0); }
+  .boot-line .ok { color: #00ff88; margin-left: 8px; }
+  .boot-line .dim { color: var(--dim); }
+
+  .boot-bar-wrap {
+    width: min(500px, 90vw);
+    height: 2px;
+    background: rgba(255,255,255,0.05);
+    margin-top: 24px;
+    overflow: hidden;
+  }
+
+  .boot-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--red);
+    box-shadow: 0 0 12px var(--red-glow);
+    transition: width 1.8s ease;
+  }
+
+  /* ── COUNTDOWN ── */
+  .countdown-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 14px 28px;
+    border: 1px solid rgba(192,21,42,0.3);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .countdown-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 1px;
+    background: var(--red-glow);
+    animation: scan-line 3s linear infinite;
+  }
+
+  .countdown-label { color: var(--red); font-size: 9px; letter-spacing: 4px; }
+
+  .countdown-time {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-shadow: 0 0 20px var(--red);
+    line-height: 1;
+  }
+
+  /* ── WAVEFORM ── */
+  .hero-waveform {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 40px;
+    opacity: 0.35;
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: var(--red);
+    border-radius: 2px;
+    animation: wave-pulse var(--dur) ease-in-out infinite alternate;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes wave-pulse {
+    from { height: 4px; }
+    to { height: var(--h); }
+  }
+
+  /* ── NAV TOP BAR ── */
+  .nav-top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), var(--red-glow), var(--red), transparent);
+    z-index: 1001;
+    animation: top-bar-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes top-bar-pulse {
+    0%, 100% { opacity: 0.6; box-shadow: 0 0 8px var(--red); }
+    50% { opacity: 1; box-shadow: 0 0 20px var(--red-glow), 0 0 40px rgba(255,26,51,0.3); }
+  }
+
+  /* ── CARD SCAN LINE ON HOVER ── */
+  .track-card, .featured-track {
+    --scan-pos: -100%;
+  }
+
+  .track-card::after, .featured-track::after {
+    content: '';
+    position: absolute;
+    top: 0; left: var(--scan-pos);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,26,51,0.6), transparent);
+    pointer-events: none;
+    transition: none;
+  }
+
+  .track-card:hover::after, .featured-track:hover::after {
+    animation: card-scan 1.2s linear infinite;
+  }
+
+  @keyframes card-scan {
+    from { left: -60%; }
+    to { left: 100%; }
+  }
+
+  /* ── ENHANCED GLITCH ── */
+  .hero-title .glitch-text::before { animation: glitch1 2.5s infinite; }
+  .hero-title .glitch-text::after  { animation: glitch2 2.5s infinite; }
+
+  @keyframes glitch1 {
+    0%, 80%, 100% { transform: translate(0); opacity: 0; }
+    82% { transform: translate(-6px, 2px) skewX(-5deg); opacity: 1; clip-path: polygon(0 15%, 100% 15%, 100% 45%, 0 45%); }
+    84% { transform: translate(6px, -2px) skewX(3deg); opacity: 1; clip-path: polygon(0 55%, 100% 55%, 100% 80%, 0 80%); }
+    86% { transform: translate(-3px, 0); opacity: 0.8; clip-path: polygon(0 0, 100% 0, 100% 30%, 0 30%); }
+    88% { transform: translate(0); opacity: 0; }
+  }
+
+  @keyframes glitch2 {
+    0%, 80%, 100% { transform: translate(0); opacity: 0; }
+    83% { transform: translate(8px, -3px); opacity: 0.4; clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); }
+    85% { transform: translate(-8px, 3px); opacity: 0.4; clip-path: polygon(0 30%, 100% 30%, 100% 60%, 0 60%); }
+    87% { transform: translate(0); opacity: 0; }
+  }
+
+  /* ── RGB SPLIT ON HOVER ── */
+  .nav-logo:hover::after {
+    animation: glitch-logo 0.3s infinite !important;
+  }
 </style>
 </head>
 <body>
 
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div class="boot-logo">KΛIROS</div>
+  <div class="boot-lines" id="bootLines"></div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="bootBar"></div></div>
+</div>
+
+<div class="nav-top-bar"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 <div class="grid-bg"></div>
 <div class="scanlines"></div>
@@ -1012,10 +1211,21 @@
       <span class="glitch-text">KΛIROS</span>
     </h1>
     <p class="hero-sub">Born in the underground. Powered by the algorithm.</p>
-    <div class="hero-transmission">
-      ▸ DAILY TRANSMISSIONS: 06:00 UTC &nbsp;|&nbsp; 20:00 UTC
+    <div class="countdown-wrap">
+      <div>
+        <div class="countdown-label">NEXT TRANSMISSION IN</div>
+        <div class="countdown-time" id="countdown">00:00:00</div>
+      </div>
+      <div style="width:1px;height:40px;background:rgba(192,21,42,0.3)"></div>
+      <div>
+        <div class="countdown-label">DAILY DROPS</div>
+        <div class="countdown-time" style="font-size:18px;letter-spacing:2px">06:00 &amp; 20:00 UTC</div>
+      </div>
     </div>
   </div>
+
+  <!-- WAVEFORM -->
+  <div class="hero-waveform" id="heroWave"></div>
 
   <div class="ticker-wrap">
     <div class="ticker">
@@ -1457,6 +1667,71 @@
     document.body.style.transform = `skewX(${(Math.random() - 0.5) * 0.3}deg)`;
     setTimeout(() => { document.body.style.transform = ''; }, 80);
   }, 5000 + Math.random() * 5000);
+
+  // ── BOOT SCREEN ──────────────────────────────────────────────
+  const bootLines = [
+    { text: 'INITIALIZING KAIROS NEURAL CORE', delay: 200 },
+    { text: 'CONNECTING TO BEATPORT DATA STREAM <span class="ok">OK</span>', delay: 500 },
+    { text: 'SCRAPING REDDIT UNDERGROUND FEEDS <span class="ok">OK</span>', delay: 800 },
+    { text: 'LOADING MUSICGEN-MEDIUM MODEL <span class="ok">OK</span>', delay: 1100 },
+    { text: 'TREND ANALYSIS: <span class="ok">INDUSTRIAL RISING +34%</span>', delay: 1400 },
+    { text: 'NEXT TRANSMISSION: <span class="ok">SCHEDULED</span>', delay: 1700 },
+    { text: '<span class="dim">ALL SYSTEMS OPERATIONAL — TRANSMITTING</span>', delay: 2000 },
+  ];
+
+  const linesEl = document.getElementById('bootLines');
+  const bar = document.getElementById('bootBar');
+
+  bootLines.forEach(({ text, delay }) => {
+    const line = document.createElement('div');
+    line.className = 'boot-line';
+    line.innerHTML = '> ' + text;
+    linesEl.appendChild(line);
+    setTimeout(() => line.classList.add('show'), delay);
+  });
+
+  setTimeout(() => { bar.style.width = '100%'; }, 300);
+
+  setTimeout(() => {
+    const screen = document.getElementById('boot-screen');
+    screen.classList.add('hidden');
+    setTimeout(() => screen.remove(), 700);
+  }, 2800);
+
+  // ── COUNTDOWN TO NEXT TRANSMISSION ───────────────────────────
+  function updateCountdown() {
+    const now = new Date();
+    const utcH = now.getUTCHours(), utcM = now.getUTCMinutes(), utcS = now.getUTCSeconds();
+    const totalSecs = utcH * 3600 + utcM * 60 + utcS;
+    const drops = [6 * 3600, 20 * 3600]; // 6:00 and 20:00 UTC
+    const daySecs = 86400;
+
+    let minDiff = daySecs;
+    for (const d of drops) {
+      let diff = d - totalSecs;
+      if (diff < 0) diff += daySecs;
+      if (diff < minDiff) minDiff = diff;
+    }
+
+    const h = String(Math.floor(minDiff / 3600)).padStart(2, '0');
+    const m = String(Math.floor((minDiff % 3600) / 60)).padStart(2, '0');
+    const s = String(minDiff % 60).padStart(2, '0');
+    document.getElementById('countdown').textContent = `${h}:${m}:${s}`;
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ── HERO WAVEFORM ─────────────────────────────────────────────
+  const waveEl = document.getElementById('heroWave');
+  const heights = [6,10,18,28,36,40,36,32,38,40,34,28,20,28,38,40,36,28,18,10,14,22,34,40,38,30,20,12,8,14,24,36,40,38,28,16,8,14,26,38];
+  heights.forEach((h, i) => {
+    const b = document.createElement('div');
+    b.className = 'wave-bar';
+    b.style.setProperty('--h', h + 'px');
+    b.style.setProperty('--dur', (0.6 + Math.random() * 0.8).toFixed(2) + 's');
+    b.style.setProperty('--delay', (i * 0.04).toFixed(2) + 's');
+    waveEl.appendChild(b);
+  });
 </script>
 </body>
 </html>
