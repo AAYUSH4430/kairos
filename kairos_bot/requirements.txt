@@ -1,0 +1,14 @@
+# Core scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# Audio generation (heavy — install separately if needed)
+# audiocraft  # Meta's MusicGen — install via: pip install audiocraft
+# torch>=2.0.0
+# torchaudio>=2.0.0
+
+# Scheduling (optional — for running without Task Scheduler)
+# schedule>=1.2.0

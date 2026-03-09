@@ -1,0 +1,6 @@
+kairos_bot/.env
+kairos_bot/output/
+kairos_bot/trends_cache.json
+kairos_bot/kairos.log
+kairos_bot/__pycache__/
+*.pyc

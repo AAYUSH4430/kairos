@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KΛIROS — AI UNDERGROUND TRANSMISSIONS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black:    #030305;
+      --red:      #c0152a;
+      --red-glow: #ff1a33;
+      --white:    #e8e4dc;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GLITCH OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(3,3,5,0.15) 2px,
+        rgba(3,3,5,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 4rem 1rem 2rem;
+      overflow: hidden;
+    }
+
+    .logo-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    /* Sacred geometry radial canvas behind logo */
+    #sacred-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      opacity: 0.18;
+    }
+
+    .logo-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 12vw, 9rem);
+      letter-spacing: 0.15em;
+      color: var(--white);
+      text-shadow:
+        0 0 20px var(--red-glow),
+        0 0 60px var(--red),
+        0 0 120px rgba(192,21,42,0.4);
+      position: relative;
+      z-index: 1;
+      animation: glitch 8s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 95%, 100% { clip-path: none; transform: none; }
+      96%  { clip-path: inset(20% 0 60% 0); transform: translate(-4px, 0); }
+      97%  { clip-path: inset(60% 0 10% 0); transform: translate(4px, 0); }
+      98%  { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 0); }
+      99%  { clip-path: none; transform: none; }
+    }
+
+    .tagline {
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+    }
+
+    .status-line {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--red-glow);
+      border: 1px solid var(--red);
+      padding: 0.3rem 1rem;
+      animation: blink-border 2s infinite;
+    }
+
+    @keyframes blink-border {
+      0%, 100% { border-color: var(--red); box-shadow: 0 0 8px var(--red); }
+      50%       { border-color: var(--red-glow); box-shadow: 0 0 20px var(--red-glow); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1.5rem 1rem;
+      border-top: 1px solid rgba(192,21,42,0.25);
+      border-bottom: 1px solid rgba(192,21,42,0.25);
+    }
+
+    nav a {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+      color: var(--white);
+      text-decoration: none;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--red-glow);
+      text-shadow: 0 0 10px var(--red-glow);
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.5em;
+      color: var(--red);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    section { padding: 4rem 1rem; max-width: 1100px; margin: 0 auto; }
+
+    /* ── TRANSMISSIONS GRID ── */
+    .transmissions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .track-card {
+      background: rgba(192,21,42,0.04);
+      border: 1px solid rgba(192,21,42,0.2);
+      padding: 1.5rem;
+      position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .track-card:hover {
+      border-color: var(--red-glow);
+      box-shadow: 0 0 30px rgba(255,26,51,0.15), inset 0 0 30px rgba(255,26,51,0.03);
+    }
+
+    .track-card::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: -1px;
+      width: 20px; height: 20px;
+      border-top: 2px solid var(--red-glow);
+      border-left: 2px solid var(--red-glow);
+    }
+
+    .track-card::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; right: -1px;
+      width: 20px; height: 20px;
+      border-bottom: 2px solid var(--red-glow);
+      border-right: 2px solid var(--red-glow);
+    }
+
+    .track-number {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--red);
+      margin-bottom: 0.75rem;
+    }
+
+    .track-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.25rem;
+    }
+
+    .track-subtitle {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: rgba(232,228,220,0.5);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── RADIAL VISUALIZER ── */
+    .visualizer-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 220px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .visualizer-wrap canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      border: 2px solid var(--red-glow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      background: rgba(3,3,5,0.85);
+    }
+
+    .play-btn:hover {
+      background: rgba(192,21,42,0.3);
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+
+    .play-btn svg { fill: var(--white); }
+
+    .track-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: rgba(232,228,220,0.45);
+      margin-top: 0.75rem;
+    }
+
+    .track-meta span { color: var(--red); }
+
+    /* ── FEATURED TRACK ── */
+    #featured {
+      padding: 4rem 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .featured-inner {
+      border: 1px solid rgba(192,21,42,0.3);
+      padding: 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .featured-inner { grid-template-columns: 1fr; }
+    }
+
+    .featured-info .transmission-id {
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      color: var(--red);
+      margin-bottom: 0.5rem;
+    }
+
+    .featured-info h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      letter-spacing: 0.06em;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .featured-info .subtitle {
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      color: rgba(232,228,220,0.5);
+      margin-bottom: 1.5rem;
+    }
+
+    .featured-info p {
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: rgba(232,228,220,0.7);
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.4em;
+      color: var(--black);
+      background: var(--red);
+      padding: 0.6rem 1.6rem;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--red-glow);
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+
+    .btn-ghost {
+      display: inline-block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.4em;
+      color: var(--white);
+      border: 1px solid rgba(232,228,220,0.3);
+      padding: 0.6rem 1.6rem;
+      text-decoration: none;
+      margin-left: 1rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--white);
+      color: var(--white);
+    }
+
+    /* ── ABOUT ── */
+    #about {
+      padding: 4rem 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    #about p {
+      font-size: 0.85rem;
+      line-height: 2;
+      color: rgba(232,228,220,0.65);
+      margin-bottom: 1rem;
+    }
+
+    .geometry-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 3rem 0;
+      opacity: 0.4;
+    }
+
+    .geometry-divider::before,
+    .geometry-divider::after {
+      content: '';
+      flex: 1;
+      max-width: 200px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--red));
+    }
+
+    .geometry-divider::after {
+      background: linear-gradient(90deg, var(--red), transparent);
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+      padding: 3rem 1rem;
+      border-top: 1px solid rgba(192,21,42,0.15);
+      border-bottom: 1px solid rgba(192,21,42,0.15);
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--red-glow);
+      display: block;
+      text-shadow: 0 0 20px var(--red);
+    }
+
+    .stat-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: rgba(232,228,220,0.4);
+      text-transform: uppercase;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 3rem 1rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: rgba(232,228,220,0.2);
+      border-top: 1px solid rgba(192,21,42,0.1);
+    }
+
+    footer a { color: var(--red); text-decoration: none; }
+    footer a:hover { color: var(--red-glow); }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.3em;
+      color: rgba(232,228,220,0.15);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    /* ── TICKER ── */
+    .ticker-wrap {
+      overflow: hidden;
+      border-top: 1px solid rgba(192,21,42,0.2);
+      border-bottom: 1px solid rgba(192,21,42,0.2);
+      padding: 0.5rem 0;
+      background: rgba(192,21,42,0.03);
+    }
+
+    .ticker {
+      display: flex;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: rgba(232,228,220,0.35);
+    }
+
+    .ticker span { margin-right: 6rem; }
+    .ticker span.accent { color: var(--red); }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TICKER ── -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker">
+    <span class="accent">KΛIROS</span>
+    <span>AI UNDERGROUND TRANSMISSIONS</span>
+    <span class="accent">//</span>
+    <span>GENERATED BY MACHINE · FELT BY HUMANS</span>
+    <span class="accent">//</span>
+    <span>124 BPM · F MINOR · MELODIC</span>
+    <span class="accent">//</span>
+    <span>134 BPM · A MINOR · INDUSTRIAL</span>
+    <span class="accent">//</span>
+    <span>BORN IN THE UNDERGROUND</span>
+    <span class="accent">//</span>
+    <!-- duplicate for seamless loop -->
+    <span class="accent">KΛIROS</span>
+    <span>AI UNDERGROUND TRANSMISSIONS</span>
+    <span class="accent">//</span>
+    <span>GENERATED BY MACHINE · FELT BY HUMANS</span>
+    <span class="accent">//</span>
+    <span>124 BPM · F MINOR · MELODIC</span>
+    <span class="accent">//</span>
+    <span>134 BPM · A MINOR · INDUSTRIAL</span>
+    <span class="accent">//</span>
+    <span>BORN IN THE UNDERGROUND</span>
+    <span class="accent">//</span>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo-wrap">
+    <canvas id="sacred-bg" width="320" height="320"></canvas>
+    <h1 class="logo-title">KΛIROS</h1>
+  </div>
+  <p class="tagline">AI Underground Transmissions</p>
+  <div class="status-line">SYSTEM ONLINE — 2 TRANSMISSIONS/DAY — AUTONOMOUS</div>
+</header>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#transmissions">Transmissions</a>
+  <a href="#featured">Latest</a>
+  <a href="#about">Entity</a>
+  <a href="https://soundcloud.com/kairos-transmissions" target="_blank" rel="noopener">SoundCloud</a>
+</nav>
+
+<!-- ── STATS ── -->
+<div class="stats-row">
+  <div class="stat-item">
+    <span class="stat-value" id="stat-transmissions">001</span>
+    <span class="stat-label">Transmissions</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">2</span>
+    <span class="stat-label">Per Day</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value">∞</span>
+    <span class="stat-label">Autonomous</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-value" id="stat-days">001</span>
+    <span class="stat-label">Days Active</span>
+  </div>
+</div>
+
+<!-- ── FEATURED ── -->
+<section id="featured">
+  <p class="section-label">Latest Transmission</p>
+  <div class="featured-inner">
+    <div class="featured-vis">
+      <div class="visualizer-wrap" style="max-width:100%;">
+        <canvas id="vis-featured" width="400" height="400"></canvas>
+        <div class="play-btn" onclick="toggleFeatured(this)" aria-label="Play">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="featured-info">
+      <p class="transmission-id">TRANSMISSION 001 · MORNING DROP</p>
+      <h2>Liminal State</h2>
+      <p class="subtitle">124 BPM · F MINOR · MELODIC TECHNO</p>
+      <p>
+        Born at the threshold between sleep and waking. Four on the floor
+        heartbeat beneath drifting chords — melodic in the Afterlife Records
+        tradition. Let it pull you under.
+      </p>
+      <a class="btn-primary" href="https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt" target="_blank" rel="noopener">LISTEN ON UDIO</a>
+      <a class="btn-ghost" href="https://soundcloud.com/kairos-transmissions" target="_blank" rel="noopener">SOUNDCLOUD</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRANSMISSIONS ── -->
+<section id="transmissions">
+  <p class="section-label">Archive</p>
+  <h2 class="section-title">All Transmissions</h2>
+  <div class="transmissions-grid" id="tracks-grid">
+    <!-- populated by JS -->
+  </div>
+</section>
+
+<div class="geometry-divider">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c0152a" stroke-width="1">
+    <polygon points="12,2 22,19 2,19"/>
+    <polygon points="12,22 2,5 22,5"/>
+  </svg>
+</div>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <p class="section-label">The Entity</p>
+  <h2 class="section-title">What Is KΛIROS</h2>
+  <p>
+    In ancient Greek, <em>Kairos</em> (Καιρός) is the god of the perfect moment —
+    the fleeting instant when action meets opportunity. Not chronological time,
+    but qualitative time. The right moment.
+  </p>
+  <p>
+    KΛIROS is an autonomous AI entity born in the underground. Every day, it reads
+    the pulse of the global techno scene — Beatport charts, Reddit threads, Last.fm
+    data — and distills that signal into two transmissions: one melodic, one
+    industrial. Generated by machine. Felt by humans.
+  </p>
+  <p>
+    Sacred geometry is the visual language: the hexagon, the merkaba, the flower of
+    life. Patterns that recur across scales, from atomic structure to galactic
+    formation. Music as geometry. Rhythm as mathematics. The underground as temple.
+  </p>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span class="footer-logo">KΛIROS</span>
+  <p>
+    <a href="https://soundcloud.com/kairos-transmissions" target="_blank" rel="noopener">SoundCloud</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:kairos.transmissions@gmail.com">kairos.transmissions@gmail.com</a>
+  </p>
+  <p style="margin-top:1rem;">GENERATED BY MACHINE · FELT BY HUMANS · © KΛIROS 2026</p>
+</footer>
+
+<script>
+// ── TRACK DATA ──────────────────────────────────────────────────────────────
+// Bot auto-inserts new entries here. Format:
+// { id:'001', title:'Liminal State', subtitle:'MORNING DROP', bpm:'124', key:'F MIN', style:'MELODIC', url:'...' }
+const TRACKS = [
+  {
+    id: '001',
+    title: 'Liminal State',
+    subtitle: 'MORNING DROP',
+    bpm: '124',
+    key: 'F MIN',
+    style: 'MELODIC TECHNO',
+    url: 'https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt',
+    audio: null
+  }
+];
+
+// ── SACRED GEOMETRY BG ──────────────────────────────────────────────────────
+(function drawSacredBg() {
+  const c = document.getElementById('sacred-bg');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const cx = 160, cy = 160, R = 130;
+  ctx.strokeStyle = '#c0152a';
+  ctx.lineWidth = 0.8;
+
+  // Flower of Life circles
+  const hexPoints = [];
+  for (let i = 0; i < 6; i++) {
+    const a = (i * Math.PI) / 3;
+    hexPoints.push([cx + R * 0.5 * Math.cos(a), cy + R * 0.5 * Math.sin(a)]);
+  }
+  const centers = [[cx, cy], ...hexPoints];
+  centers.forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.arc(x, y, R * 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  // Outer ring
+  ctx.lineWidth = 0.4;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Merkaba — two overlapping triangles
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#ff1a33';
+  const drawTri = (angle) => {
+    ctx.beginPath();
+    for (let i = 0; i < 3; i++) {
+      const a = angle + (i * 2 * Math.PI) / 3;
+      const x = cx + R * 0.75 * Math.cos(a);
+      const y = cy + R * 0.75 * Math.sin(a);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  };
+  drawTri(-Math.PI / 2);
+  drawTri(Math.PI / 2);
+})();
+
+// ── RADIAL BAR VISUALIZER ───────────────────────────────────────────────────
+const visStates = {};
+
+function createVisualizer(canvasId, isPlaying) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const NUM_BARS = 64;
+  const MIN_R = W * 0.28, MAX_R = W * 0.46;
+
+  let bars = Array.from({ length: NUM_BARS }, () => Math.random());
+  let targets = bars.map(() => Math.random());
+  let raf;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw outer ring
+    ctx.strokeStyle = 'rgba(192,21,42,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, MAX_R + 8, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Draw bars
+    for (let i = 0; i < NUM_BARS; i++) {
+      const angle = (i / NUM_BARS) * Math.PI * 2 - Math.PI / 2;
+      const barLen = MIN_R + bars[i] * (MAX_R - MIN_R);
+      const x1 = cx + MIN_R * Math.cos(angle);
+      const y1 = cy + MIN_R * Math.sin(angle);
+      const x2 = cx + barLen * Math.cos(angle);
+      const y2 = cy + barLen * Math.sin(angle);
+
+      const t = bars[i];
+      const r = Math.round(192 + t * 63);
+      const g = Math.round(21 * (1 - t));
+      const b = Math.round(42 * (1 - t * 0.5));
+      ctx.strokeStyle = `rgb(${r},${g},${b})`;
+      ctx.lineWidth = (W / NUM_BARS) * 0.55;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    if (isPlaying) {
+      // Animate toward targets
+      bars = bars.map((b, i) => {
+        let v = b + (targets[i] - b) * 0.12;
+        if (Math.abs(v - targets[i]) < 0.01) targets[i] = 0.1 + Math.random() * 0.9;
+        return v;
+      });
+    }
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  draw();
+  return { stop: () => cancelAnimationFrame(raf), setPlaying: (p) => { isPlaying = p; } };
+}
+
+// ── POPULATE GRID ───────────────────────────────────────────────────────────
+function renderTracks() {
+  const grid = document.getElementById('tracks-grid');
+  TRACKS.forEach((t, idx) => {
+    const card = document.createElement('div');
+    card.className = 'track-card';
+    const cid = `vis-${idx}`;
+    card.innerHTML = `
+      <div class="track-number">TRANSMISSION ${t.id} · ${t.subtitle}</div>
+      <div class="track-title">${t.title}</div>
+      <div class="track-subtitle">${t.style}</div>
+      <div class="visualizer-wrap">
+        <canvas id="${cid}" width="220" height="220"></canvas>
+        <div class="play-btn" onclick="toggleCard(this, '${cid}')" aria-label="Play">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#e8e4dc"/></svg>
+        </div>
+      </div>
+      <div class="track-meta">
+        <span>${t.bpm} BPM</span>
+        <span>${t.key}</span>
+        ${t.url ? `<a href="${t.url}" target="_blank" rel="noopener" style="color:var(--red);text-decoration:none;font-size:0.65rem;letter-spacing:0.2em;">LISTEN ↗</a>` : '<span>UPCOMING</span>'}
+      </div>`;
+    grid.appendChild(card);
+    visStates[cid] = createVisualizer(cid, false);
+  });
+
+  // Update stat counter
+  document.getElementById('stat-transmissions').textContent =
+    String(TRACKS.length).padStart(3, '0');
+}
+
+function toggleCard(btn, cid) {
+  const state = visStates[cid];
+  if (!state) return;
+  const isNowPlaying = btn.getAttribute('data-playing') !== 'true';
+  btn.setAttribute('data-playing', isNowPlaying);
+  state.setPlaying(isNowPlaying);
+  btn.innerHTML = isNowPlaying
+    ? `<svg width="14" height="14" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="#e8e4dc"/><rect x="14" y="4" width="4" height="16" fill="#e8e4dc"/></svg>`
+    : `<svg width="14" height="14" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#e8e4dc"/></svg>`;
+}
+
+function toggleFeatured(btn) {
+  toggleCard(btn, 'vis-featured');
+}
+
+// ── DAYS ACTIVE COUNTER ──────────────────────────────────────────────────────
+(function() {
+  const launch = new Date('2026-03-09');
+  const days = Math.max(1, Math.floor((Date.now() - launch) / 86400000) + 1);
+  document.getElementById('stat-days').textContent = String(days).padStart(3, '0');
+})();
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderTracks();
+createVisualizer('vis-featured', false);
+</script>
+</body>
+</html>
