@@ -1,807 +1,1462 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KΛIROS — AI UNDERGROUND TRANSMISSIONS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --black:    #030305;
-      --red:      #c0152a;
-      --red-glow: #ff1a33;
-      --white:    #e8e4dc;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KΛIROS — AI UNDERGROUND TRANSMISSIONS</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #030305;
+    --deep: #07070f;
+    --red: #c0152a;
+    --red-glow: #ff1a33;
+    --white: #e8e4dc;
+    --dim: #6b6660;
+    --grid: rgba(192,21,42,0.07);
+  }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'Share Tech Mono', monospace;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+  html { scroll-behavior: smooth; }
 
-    /* ── GLITCH OVERLAY ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(3,3,5,0.15) 2px,
-        rgba(3,3,5,0.15) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Share Tech Mono', monospace;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
 
-    /* ── HEADER ── */
-    header {
-      position: relative;
-      text-align: center;
-      padding: 4rem 1rem 2rem;
-      overflow: hidden;
-    }
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
 
-    .logo-wrap {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 1rem;
-    }
+  /* GRID BACKGROUND */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    /* Sacred geometry radial canvas behind logo */
-    #sacred-bg {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 320px;
-      height: 320px;
-      opacity: 0.18;
-    }
+  /* SCANLINES */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9998;
+  }
 
-    .logo-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(4rem, 12vw, 9rem);
-      letter-spacing: 0.15em;
-      color: var(--white);
-      text-shadow:
-        0 0 20px var(--red-glow),
-        0 0 60px var(--red),
-        0 0 120px rgba(192,21,42,0.4);
-      position: relative;
-      z-index: 1;
-      animation: glitch 8s infinite;
-    }
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(192,21,42,0.2);
+    background: rgba(3,3,5,0.85);
+    backdrop-filter: blur(10px);
+  }
 
-    @keyframes glitch {
-      0%, 95%, 100% { clip-path: none; transform: none; }
-      96%  { clip-path: inset(20% 0 60% 0); transform: translate(-4px, 0); }
-      97%  { clip-path: inset(60% 0 10% 0); transform: translate(4px, 0); }
-      98%  { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 0); }
-      99%  { clip-path: none; transform: none; }
-    }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 8px;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+  }
 
-    .tagline {
-      font-size: 0.75rem;
-      letter-spacing: 0.4em;
-      color: var(--red);
-      text-transform: uppercase;
-      margin-top: 0.5rem;
-    }
+  .nav-logo::after {
+    content: 'KΛIROS';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    color: var(--red);
+    z-index: -1;
+    animation: glitch-logo 4s infinite;
+  }
 
-    .status-line {
-      display: inline-block;
-      margin-top: 1.5rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      color: var(--red-glow);
-      border: 1px solid var(--red);
-      padding: 0.3rem 1rem;
-      animation: blink-border 2s infinite;
-    }
+  @keyframes glitch-logo {
+    0%, 90%, 100% { opacity: 0; transform: translate(0); }
+    92% { opacity: 1; transform: translate(-3px, 1px); }
+    94% { opacity: 1; transform: translate(3px, -1px); }
+    96% { opacity: 0; }
+  }
 
-    @keyframes blink-border {
-      0%, 100% { border-color: var(--red); box-shadow: 0 0 8px var(--red); }
-      50%       { border-color: var(--red-glow); box-shadow: 0 0 20px var(--red-glow); }
-    }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
 
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      padding: 1.5rem 1rem;
-      border-top: 1px solid rgba(192,21,42,0.25);
-      border-bottom: 1px solid rgba(192,21,42,0.25);
-    }
+  .nav-links a {
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
 
-    nav a {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0.3em;
-      color: var(--white);
-      text-decoration: none;
-      transition: color 0.2s, text-shadow 0.2s;
-    }
+  .nav-links a:hover { color: var(--red-glow); }
 
-    nav a:hover {
-      color: var(--red-glow);
-      text-shadow: 0 0 10px var(--red-glow);
-    }
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--dim);
+  }
 
-    /* ── SECTION HEADERS ── */
-    .section-label {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.5em;
-      color: var(--red);
-      text-align: center;
-      margin-bottom: 0.5rem;
-    }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--red-glow);
+    border-radius: 50%;
+    animation: pulse-dot 1.5s infinite;
+    box-shadow: 0 0 8px var(--red-glow);
+  }
 
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      letter-spacing: 0.1em;
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
 
-    section { padding: 4rem 1rem; max-width: 1100px; margin: 0 auto; }
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 1;
+  }
 
-    /* ── TRANSMISSIONS GRID ── */
-    .transmissions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
+  /* SVG SACRED GEOMETRY */
+  .sacred-geo {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
 
-    .track-card {
-      background: rgba(192,21,42,0.04);
-      border: 1px solid rgba(192,21,42,0.2);
-      padding: 1.5rem;
-      position: relative;
-      transition: border-color 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
+  .sacred-geo svg {
+    width: min(800px, 90vw);
+    height: min(800px, 90vw);
+    opacity: 0.12;
+    animation: rotate-geo 60s linear infinite;
+  }
 
-    .track-card:hover {
-      border-color: var(--red-glow);
-      box-shadow: 0 0 30px rgba(255,26,51,0.15), inset 0 0 30px rgba(255,26,51,0.03);
-    }
+  .sacred-geo svg .inner {
+    animation: rotate-geo 30s linear infinite reverse;
+    transform-origin: center;
+  }
 
-    .track-card::before {
-      content: '';
-      position: absolute;
-      top: -1px; left: -1px;
-      width: 20px; height: 20px;
-      border-top: 2px solid var(--red-glow);
-      border-left: 2px solid var(--red-glow);
-    }
+  @keyframes rotate-geo {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 
-    .track-card::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; right: -1px;
-      width: 20px; height: 20px;
-      border-bottom: 2px solid var(--red-glow);
-      border-right: 2px solid var(--red-glow);
-    }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 20px;
+  }
 
-    .track-number {
-      font-size: 0.6rem;
-      letter-spacing: 0.4em;
-      color: var(--red);
-      margin-bottom: 0.75rem;
-    }
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 6px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: fadeInUp 1s ease both;
+  }
 
-    .track-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.25rem;
-    }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 18vw, 220px);
+    line-height: 0.85;
+    letter-spacing: -4px;
+    color: var(--white);
+    position: relative;
+    animation: fadeInUp 1s 0.2s ease both;
+  }
 
-    .track-subtitle {
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      color: rgba(232,228,220,0.5);
-      margin-bottom: 1.25rem;
-    }
+  .hero-title .glitch-text {
+    position: relative;
+    display: inline-block;
+  }
 
-    /* ── RADIAL VISUALIZER ── */
-    .visualizer-wrap {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1;
-      max-width: 220px;
-      margin: 0 auto 1.25rem;
-    }
+  .hero-title .glitch-text::before,
+  .hero-title .glitch-text::after {
+    content: 'KΛIROS';
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+  }
 
-    .visualizer-wrap canvas {
-      width: 100%;
-      height: 100%;
-    }
+  .hero-title .glitch-text::before {
+    color: var(--red);
+    animation: glitch1 3s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+  }
 
-    .play-btn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 48px;
-      height: 48px;
-      border: 2px solid var(--red-glow);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s, box-shadow 0.2s;
-      background: rgba(3,3,5,0.85);
-    }
+  .hero-title .glitch-text::after {
+    color: #0ff;
+    animation: glitch2 3s infinite;
+    clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+    opacity: 0.3;
+  }
 
-    .play-btn:hover {
-      background: rgba(192,21,42,0.3);
-      box-shadow: 0 0 20px var(--red-glow);
-    }
+  @keyframes glitch1 {
+    0%, 85%, 100% { transform: translate(0); opacity: 0; }
+    87% { transform: translate(-4px, 2px); opacity: 1; }
+    89% { transform: translate(4px, -2px); opacity: 1; }
+    91% { transform: translate(0); opacity: 0; }
+  }
 
-    .play-btn svg { fill: var(--white); }
+  @keyframes glitch2 {
+    0%, 85%, 100% { transform: translate(0); opacity: 0; }
+    88% { transform: translate(6px, -3px); opacity: 0.5; }
+    90% { transform: translate(-6px, 3px); opacity: 0.5; }
+    92% { transform: translate(0); opacity: 0; }
+  }
 
-    .track-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: rgba(232,228,220,0.45);
-      margin-top: 0.75rem;
-    }
+  .hero-sub {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-top: 20px;
+    animation: fadeInUp 1s 0.4s ease both;
+  }
 
-    .track-meta span { color: var(--red); }
+  .hero-transmission {
+    margin-top: 50px;
+    padding: 16px 30px;
+    border: 1px solid rgba(192,21,42,0.3);
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    animation: fadeInUp 1s 0.6s ease both;
+    position: relative;
+    overflow: hidden;
+  }
 
-    /* ── FEATURED TRACK ── */
-    #featured {
-      padding: 4rem 1rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+  .hero-transmission::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 1px;
+    background: var(--red-glow);
+    animation: scan-line 3s linear infinite;
+  }
 
-    .featured-inner {
-      border: 1px solid rgba(192,21,42,0.3);
-      padding: 2.5rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: center;
-    }
+  @keyframes scan-line {
+    from { left: -100%; }
+    to { left: 100%; }
+  }
 
-    @media (max-width: 640px) {
-      .featured-inner { grid-template-columns: 1fr; }
-    }
+  .ticker-wrap {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 40px;
+    background: rgba(192,21,42,0.1);
+    border-top: 1px solid rgba(192,21,42,0.3);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    z-index: 5;
+  }
 
-    .featured-info .transmission-id {
-      font-size: 0.6rem;
-      letter-spacing: 0.5em;
-      color: var(--red);
-      margin-bottom: 0.5rem;
-    }
+  .ticker {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker 25s linear infinite;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--red);
+  }
 
-    .featured-info h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      letter-spacing: 0.06em;
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
+  .ticker span { padding: 0 40px; }
 
-    .featured-info .subtitle {
-      font-size: 0.7rem;
-      letter-spacing: 0.35em;
-      color: rgba(232,228,220,0.5);
-      margin-bottom: 1.5rem;
-    }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 
-    .featured-info p {
-      font-size: 0.8rem;
-      line-height: 1.8;
-      color: rgba(232,228,220,0.7);
-      margin-bottom: 1.5rem;
-    }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .btn-primary {
-      display: inline-block;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.9rem;
-      letter-spacing: 0.4em;
-      color: var(--black);
-      background: var(--red);
-      padding: 0.6rem 1.6rem;
-      text-decoration: none;
-      transition: background 0.2s, box-shadow 0.2s;
-    }
+  /* TRANSMISSION SECTION */
+  .section {
+    position: relative;
+    z-index: 2;
+    padding: 100px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
-    .btn-primary:hover {
-      background: var(--red-glow);
-      box-shadow: 0 0 20px var(--red-glow);
-    }
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    .btn-ghost {
-      display: inline-block;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.9rem;
-      letter-spacing: 0.4em;
-      color: var(--white);
-      border: 1px solid rgba(232,228,220,0.3);
-      padding: 0.6rem 1.6rem;
-      text-decoration: none;
-      margin-left: 1rem;
-      transition: border-color 0.2s, color 0.2s;
-    }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: var(--red);
+  }
 
-    .btn-ghost:hover {
-      border-color: var(--white);
-      color: var(--white);
-    }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    letter-spacing: 4px;
+    line-height: 1;
+    margin-bottom: 60px;
+  }
 
-    /* ── ABOUT ── */
-    #about {
-      padding: 4rem 1rem;
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-    }
+  /* TRACK CARDS */
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
 
-    #about p {
-      font-size: 0.85rem;
-      line-height: 2;
-      color: rgba(232,228,220,0.65);
-      margin-bottom: 1rem;
-    }
+  .track-card {
+    background: var(--deep);
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    cursor: pointer;
+  }
 
-    .geometry-divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin: 3rem 0;
-      opacity: 0.4;
-    }
+  .track-card:hover {
+    border-color: rgba(192,21,42,0.4);
+  }
 
-    .geometry-divider::before,
-    .geometry-divider::after {
-      content: '';
-      flex: 1;
-      max-width: 200px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--red));
-    }
+  .track-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(192,21,42,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
 
-    .geometry-divider::after {
-      background: linear-gradient(90deg, var(--red), transparent);
-    }
+  .track-card:hover::before { opacity: 1; }
 
-    /* ── STATS ── */
-    .stats-row {
-      display: flex;
-      justify-content: center;
-      gap: 4rem;
-      flex-wrap: wrap;
-      padding: 3rem 1rem;
-      border-top: 1px solid rgba(192,21,42,0.15);
-      border-bottom: 1px solid rgba(192,21,42,0.15);
-    }
+  .track-time {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-    .stat-item { text-align: center; }
+  .track-time-dot {
+    width: 5px; height: 5px;
+    background: var(--red-glow);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--red-glow);
+  }
 
-    .stat-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 3rem;
-      color: var(--red-glow);
-      display: block;
-      text-shadow: 0 0 20px var(--red);
-    }
+  .track-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: rgba(255,255,255,0.03);
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    line-height: 1;
+    pointer-events: none;
+  }
 
-    .stat-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.4em;
-      color: rgba(232,228,220,0.4);
-      text-transform: uppercase;
-    }
+  .track-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
 
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      padding: 3rem 1rem;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: rgba(232,228,220,0.2);
-      border-top: 1px solid rgba(192,21,42,0.1);
-    }
+  .track-lore {
+    font-size: 11px;
+    color: var(--dim);
+    line-height: 1.7;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
 
-    footer a { color: var(--red); text-decoration: none; }
-    footer a:hover { color: var(--red-glow); }
+  .track-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
 
-    .footer-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: 0.3em;
-      color: rgba(232,228,220,0.15);
-      display: block;
-      margin-bottom: 1rem;
-    }
+  .track-meta span {
+    padding: 4px 10px;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
 
-    /* ── TICKER ── */
-    .ticker-wrap {
-      overflow: hidden;
-      border-top: 1px solid rgba(192,21,42,0.2);
-      border-bottom: 1px solid rgba(192,21,42,0.2);
-      padding: 0.5rem 0;
-      background: rgba(192,21,42,0.03);
-    }
+  /* RADIAL VISUALIZER */
+  .visualizer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
 
-    .ticker {
-      display: flex;
-      white-space: nowrap;
-      animation: ticker 30s linear infinite;
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      color: rgba(232,228,220,0.35);
-    }
+  .radial-viz {
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+    position: relative;
+  }
 
-    .ticker span { margin-right: 6rem; }
-    .ticker span.accent { color: var(--red); }
+  .radial-viz canvas {
+    width: 100%;
+    height: 100%;
+  }
 
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-  </style>
+  .viz-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .viz-freq-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 32px;
+  }
+
+  .freq-bar {
+    flex: 1;
+    background: rgba(192,21,42,0.25);
+    border-radius: 1px 1px 0 0;
+    transition: height 0.3s;
+  }
+
+  .track-card:hover .freq-bar,
+  .featured-track:hover .freq-bar {
+    animation: freq-pulse 0.6s ease infinite alternate;
+    background: rgba(192,21,42,0.7);
+  }
+
+  @keyframes freq-pulse {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+  }
+
+  .viz-duration {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+  }
+
+  .play-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .play-btn:hover {
+    border-color: var(--red-glow);
+    color: var(--red-glow);
+    box-shadow: 0 0 20px rgba(255,26,51,0.15);
+  }
+
+  .play-icon {
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid currentColor;
+  }
+
+  /* FEATURED TRACK */
+  .featured-track {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #0a0005 0%, #070010 100%);
+    border: 1px solid rgba(192,21,42,0.25);
+    padding: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .featured-badge {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--red-glow);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .featured-badge::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(192,21,42,0.5), transparent);
+  }
+
+  .featured-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(50px, 8vw, 100px);
+    letter-spacing: 6px;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  /* TREND PANEL */
+  .trend-panel {
+    background: var(--deep);
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 40px;
+    margin-top: 80px;
+  }
+
+  .trend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .trend-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    letter-spacing: 4px;
+  }
+
+  .trend-updated {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+  }
+
+  .trend-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .trend-item {
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+  }
+
+  .trend-item-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .trend-item-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  .trend-item-sub {
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .trend-bar-wrap {
+    margin-top: 12px;
+    height: 2px;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .trend-bar {
+    height: 100%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    transition: width 1.5s ease;
+  }
+
+  /* ABOUT */
+  .about-section {
+    position: relative;
+    z-index: 2;
+    padding: 100px 40px;
+    background: var(--deep);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .about-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .about-text p {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--dim);
+    margin-bottom: 20px;
+  }
+
+  .about-text p strong {
+    color: var(--white);
+    font-weight: normal;
+  }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .stat-box {
+    background: var(--black);
+    padding: 30px;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    color: var(--red-glow);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(255,26,51,0.3);
+  }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* SUBMIT */
+  .submit-section {
+    position: relative;
+    z-index: 2;
+    padding: 100px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .submit-form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .form-field {
+    width: 100%;
+    background: var(--deep);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: var(--white);
+    padding: 16px 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-field:focus {
+    border-color: rgba(192,21,42,0.5);
+  }
+
+  .form-field::placeholder { color: var(--dim); }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 18px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .submit-btn:hover {
+    background: var(--red-glow);
+    box-shadow: 0 0 40px rgba(255,26,51,0.3);
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 6px;
+    color: var(--dim);
+  }
+
+  footer .copy {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .section { padding: 60px 20px; }
+    .tracks-grid { grid-template-columns: 1fr; }
+    .featured-track { padding: 30px 20px; }
+    .trend-grid { grid-template-columns: 1fr 1fr; }
+    .about-inner { grid-template-columns: 1fr; gap: 40px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+
+  /* CUSTOM PLAYER */
+  .custom-player {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(192,21,42,0.3);
+    padding: 16px 20px;
+    margin: 20px 0 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .custom-player::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 40%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red-glow), transparent);
+    animation: scan-line 3s linear infinite;
+  }
+
+  .player-play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(192,21,42,0.6);
+    background: rgba(192,21,42,0.1);
+    color: var(--white);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .player-play-btn:hover {
+    background: rgba(192,21,42,0.3);
+    border-color: var(--red-glow);
+    box-shadow: 0 0 16px rgba(255,26,51,0.3);
+  }
+
+  .player-play-btn.active {
+    background: var(--red);
+    border-color: var(--red-glow);
+    box-shadow: 0 0 20px rgba(255,26,51,0.4);
+  }
+
+  .player-middle {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .player-title {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--white);
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .player-bar-wrap {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 6px;
+  }
+
+  .player-bar {
+    height: 100%;
+    background: var(--red);
+    width: 0%;
+    transition: width 0.5s linear;
+    box-shadow: 0 0 8px var(--red);
+  }
+
+  .player-bar-pulse {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red-glow);
+    left: 0%;
+    transition: left 0.5s linear;
+    box-shadow: 0 0 10px var(--red-glow);
+    display: none;
+  }
+
+  .player-times {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .player-right {
+    flex-shrink: 0;
+  }
+
+  .player-link {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-decoration: none;
+    border: 1px solid rgba(192,21,42,0.3);
+    padding: 6px 12px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    display: block;
+  }
+
+  .player-link:hover {
+    border-color: var(--red-glow);
+    color: var(--red-glow);
+    box-shadow: 0 0 12px rgba(255,26,51,0.2);
+  }
+
+  /* UDIO PLAYER — remove old */
+  .udio-player-wrap { display: none; }
+
+  /* CURSOR GLOW */
+  .cursor-glow {
+    position: fixed;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,21,42,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 9997;
+    transform: translate(-50%, -50%);
+    transition: left 0.1s, top 0.1s;
+  }
+</style>
 </head>
 <body>
 
-<!-- ── TICKER ── -->
-<div class="ticker-wrap" aria-hidden="true">
-  <div class="ticker">
-    <span class="accent">KΛIROS</span>
-    <span>AI UNDERGROUND TRANSMISSIONS</span>
-    <span class="accent">//</span>
-    <span>GENERATED BY MACHINE · FELT BY HUMANS</span>
-    <span class="accent">//</span>
-    <span>124 BPM · F MINOR · MELODIC</span>
-    <span class="accent">//</span>
-    <span>134 BPM · A MINOR · INDUSTRIAL</span>
-    <span class="accent">//</span>
-    <span>BORN IN THE UNDERGROUND</span>
-    <span class="accent">//</span>
-    <!-- duplicate for seamless loop -->
-    <span class="accent">KΛIROS</span>
-    <span>AI UNDERGROUND TRANSMISSIONS</span>
-    <span class="accent">//</span>
-    <span>GENERATED BY MACHINE · FELT BY HUMANS</span>
-    <span class="accent">//</span>
-    <span>124 BPM · F MINOR · MELODIC</span>
-    <span class="accent">//</span>
-    <span>134 BPM · A MINOR · INDUSTRIAL</span>
-    <span class="accent">//</span>
-    <span>BORN IN THE UNDERGROUND</span>
-    <span class="accent">//</span>
-  </div>
-</div>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="grid-bg"></div>
+<div class="scanlines"></div>
 
-<!-- ── HEADER ── -->
-<header>
-  <div class="logo-wrap">
-    <canvas id="sacred-bg" width="320" height="320"></canvas>
-    <h1 class="logo-title">KΛIROS</h1>
-  </div>
-  <p class="tagline">AI Underground Transmissions</p>
-  <div class="status-line">SYSTEM ONLINE — 2 TRANSMISSIONS/DAY — AUTONOMOUS</div>
-</header>
-
-<!-- ── NAV ── -->
+<!-- NAV -->
 <nav>
-  <a href="#transmissions">Transmissions</a>
-  <a href="#featured">Latest</a>
-  <a href="#about">Entity</a>
-  <a href="https://soundcloud.com/kairos-transmissions" target="_blank" rel="noopener">SoundCloud</a>
+  <a href="#" class="nav-logo">KΛIROS</a>
+  <ul class="nav-links">
+    <li><a href="#transmissions">Transmissions</a></li>
+    <li><a href="#signal">Signal</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    TRANSMITTING LIVE
+  </div>
 </nav>
 
-<!-- ── STATS ── -->
-<div class="stats-row">
-  <div class="stat-item">
-    <span class="stat-value" id="stat-transmissions">001</span>
-    <span class="stat-label">Transmissions</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-value">2</span>
-    <span class="stat-label">Per Day</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-value">∞</span>
-    <span class="stat-label">Autonomous</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-value" id="stat-days">001</span>
-    <span class="stat-label">Days Active</span>
-  </div>
-</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="sacred-geo">
+    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer circle -->
+      <circle cx="250" cy="250" r="240" stroke="#c0152a" stroke-width="0.5"/>
+      <!-- Middle circle -->
+      <circle cx="250" cy="250" r="180" stroke="#c0152a" stroke-width="0.5"/>
+      <!-- Inner circle -->
+      <circle cx="250" cy="250" r="120" stroke="#c0152a" stroke-width="0.5"/>
 
-<!-- ── FEATURED ── -->
-<section id="featured">
-  <p class="section-label">Latest Transmission</p>
-  <div class="featured-inner">
-    <div class="featured-vis">
-      <div class="visualizer-wrap" style="max-width:100%;">
-        <canvas id="vis-featured" width="400" height="400"></canvas>
-        <div class="play-btn" onclick="toggleFeatured(this)" aria-label="Play">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <!-- Hexagon outer -->
+      <polygon points="250,10 467,130 467,370 250,490 33,370 33,130" stroke="#c0152a" stroke-width="0.5" fill="none"/>
+      <!-- Hexagon inner -->
+      <polygon points="250,70 420,165 420,335 250,430 80,335 80,165" stroke="#c0152a" stroke-width="0.3" fill="none"/>
+
+      <!-- Star of David / Merkaba -->
+      <polygon points="250,50 450,380 50,380" stroke="#c0152a" stroke-width="0.5" fill="none"/>
+      <polygon points="250,450 50,120 450,120" stroke="#c0152a" stroke-width="0.5" fill="none"/>
+
+      <!-- Cross lines -->
+      <line x1="250" y1="10" x2="250" y2="490" stroke="#c0152a" stroke-width="0.3"/>
+      <line x1="10" y1="250" x2="490" y2="250" stroke="#c0152a" stroke-width="0.3"/>
+      <line x1="75" y1="75" x2="425" y2="425" stroke="#c0152a" stroke-width="0.3"/>
+      <line x1="425" y1="75" x2="75" y2="425" stroke="#c0152a" stroke-width="0.3"/>
+
+      <!-- Inner rotating group -->
+      <g class="inner">
+        <circle cx="250" cy="250" r="60" stroke="#c0152a" stroke-width="0.8"/>
+        <polygon points="250,190 302,222 302,278 250,310 198,278 198,222" stroke="#c0152a" stroke-width="0.8" fill="rgba(192,21,42,0.03)"/>
+        <!-- Center dot -->
+        <circle cx="250" cy="250" r="4" fill="#c0152a"/>
+        <circle cx="250" cy="250" r="8" stroke="#c0152a" stroke-width="0.5" fill="none"/>
+      </g>
+
+      <!-- Flower petals -->
+      <circle cx="250" cy="130" r="120" stroke="#c0152a" stroke-width="0.2" fill="none"/>
+      <circle cx="354" cy="190" r="120" stroke="#c0152a" stroke-width="0.2" fill="none"/>
+      <circle cx="354" cy="310" r="120" stroke="#c0152a" stroke-width="0.2" fill="none"/>
+      <circle cx="250" cy="370" r="120" stroke="#c0152a" stroke-width="0.2" fill="none"/>
+      <circle cx="146" cy="310" r="120" stroke="#c0152a" stroke-width="0.2" fill="none"/>
+      <circle cx="146" cy="190" r="120" stroke="#c0152a" stroke-width="0.2" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">— AI Underground Transmissions —</div>
+    <h1 class="hero-title">
+      <span class="glitch-text">KΛIROS</span>
+    </h1>
+    <p class="hero-sub">Born in the underground. Powered by the algorithm.</p>
+    <div class="hero-transmission">
+      ▸ DAILY TRANSMISSIONS: 06:00 UTC &nbsp;|&nbsp; 20:00 UTC
+    </div>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>KΛIROS DETECTED A FREQUENCY SHIFT AT 3AM IN WARSAW</span>
+      <span>///</span>
+      <span>NEW TRANSMISSION INCOMING — 20:00 UTC</span>
+      <span>///</span>
+      <span>HARD TECHNO RISING — MARKET ANALYSIS UPDATED</span>
+      <span>///</span>
+      <span>TRACK #007 "THRESHOLD" — 47K PLAYS IN 24H</span>
+      <span>///</span>
+      <span>KΛIROS DETECTED A FREQUENCY SHIFT AT 3AM IN WARSAW</span>
+      <span>///</span>
+      <span>NEW TRANSMISSION INCOMING — 20:00 UTC</span>
+      <span>///</span>
+      <span>HARD TECHNO RISING — MARKET ANALYSIS UPDATED</span>
+      <span>///</span>
+      <span>TRACK #007 "THRESHOLD" — 47K PLAYS IN 24H</span>
+      <span>///</span>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSMISSIONS -->
+<section class="section" id="transmissions">
+  <div class="section-label">Daily Output</div>
+  <h2 class="section-title">TRANSMISSIONS</h2>
+
+  <div class="tracks-grid">
+
+    <!-- FEATURED TRACK -->
+    <div class="featured-track">
+      <div class="featured-badge">⬡ THIS WEEK'S HIT CANDIDATE</div>
+      <div class="track-time"><div class="track-time-dot"></div> MORNING TRANSMISSION — 06:00 UTC</div>
+      <div class="featured-title">LIMINAL STATE</div>
+      <div class="track-lore">"KΛIROS detected a pattern in the Warsaw underground — a hypnotic 4/4 pulse bleeding into melodic dark space. This is the frequency of the in-between."</div>
+      <div class="track-meta">
+        <span>124 BPM</span>
+        <span>KEY: F MIN</span>
+        <span>MELODIC RAVE</span>
+        <span>3:16</span>
+      </div>
+
+      <div class="visualizer-wrap" style="margin-top:16px">
+        <div class="radial-viz"><canvas id="viz-featured" width="110" height="110"></canvas></div>
+        <div class="viz-info">
+          <div class="viz-freq-row" id="freq-featured"></div>
+          <div class="viz-duration">3:16 — 124 BPM — F MIN — TRANSMISSION 001</div>
+        </div>
+      </div>
+
+      <!-- CUSTOM PLAYER -->
+      <div class="custom-player" id="player-featured">
+        <div class="player-left">
+          <button class="player-play-btn" id="playBtn-featured" onclick="activatePlayer('featured')">
+            <span class="player-play-icon">▶</span>
+          </button>
+        </div>
+        <div class="player-middle">
+          <div class="player-title">LIMINAL STATE — TRANSMISSION 001</div>
+          <div class="player-bar-wrap">
+            <div class="player-bar" id="bar-featured"></div>
+            <div class="player-bar-pulse" id="pulse-featured"></div>
+          </div>
+          <div class="player-times">
+            <span id="time-featured">0:00</span>
+            <span>3:16</span>
+          </div>
+        </div>
+        <div class="player-right">
+          <a href="https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt" target="_blank" class="player-link">
+            LISTEN ON UDIO ↗
+          </a>
         </div>
       </div>
     </div>
-    <div class="featured-info">
-      <p class="transmission-id">TRANSMISSION 001 · MORNING DROP</p>
-      <h2>Liminal State</h2>
-      <p class="subtitle">124 BPM · F MINOR · MELODIC TECHNO</p>
-      <p>
-        Born at the threshold between sleep and waking. Four on the floor
-        heartbeat beneath drifting chords — melodic in the Afterlife Records
-        tradition. Let it pull you under.
-      </p>
-      <a class="btn-primary" href="https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt" target="_blank" rel="noopener">LISTEN ON UDIO</a>
-      <a class="btn-ghost" href="https://soundcloud.com/kairos-transmissions" target="_blank" rel="noopener">SOUNDCLOUD</a>
+
+    <!-- TRACK 2 -->
+    <div class="track-card">
+      <div class="track-number">02</div>
+      <div class="track-time"><div class="track-time-dot"></div> EVENING TRANSMISSION — 20:00 UTC</div>
+      <div class="track-name">VOIDCORE</div>
+      <div class="track-lore">"Peak hour frequency. Synthesized from Berlin energy data. Maximum dancefloor pressure."</div>
+      <div class="track-meta">
+        <span>135 BPM</span>
+        <span>HARD RAVE</span>
+      </div>
+      <div class="visualizer-wrap">
+        <div class="radial-viz"><canvas id="viz-2" width="110" height="110"></canvas></div>
+        <div class="viz-info">
+          <div class="viz-freq-row" id="freq-2"></div>
+          <div class="viz-duration">06:18 — 135 BPM — A MIN</div>
+        </div>
+      </div>
+      <button class="play-btn" onclick="togglePlay('2')"><span class="play-icon"></span> PLAY</button>
+    </div>
+
+    <!-- TRACK 3 -->
+    <div class="track-card">
+      <div class="track-number">03</div>
+      <div class="track-time"><div class="track-time-dot"></div> MORNING — YESTERDAY</div>
+      <div class="track-name">FATHER SIGNAL</div>
+      <div class="track-lore">"Monolink-influenced hypnotic drone. Deep oceanic texture meets driving rave pulse."</div>
+      <div class="track-meta">
+        <span>122 BPM</span>
+        <span>MELODIC</span>
+      </div>
+      <div class="visualizer-wrap">
+        <div class="radial-viz"><canvas id="viz-3" width="110" height="110"></canvas></div>
+        <div class="viz-info">
+          <div class="viz-freq-row" id="freq-3"></div>
+          <div class="viz-duration">07:55 — 122 BPM — D MIN</div>
+        </div>
+      </div>
+      <button class="play-btn" onclick="togglePlay('3')"><span class="play-icon"></span> PLAY</button>
+    </div>
+
+    <!-- TRACK 4 -->
+    <div class="track-card">
+      <div class="track-number">04</div>
+      <div class="track-time"><div class="track-time-dot"></div> EVENING — YESTERDAY</div>
+      <div class="track-name">THRESHOLD</div>
+      <div class="track-lore">"Raw industrial edge. KΛIROS analyzed 48hrs of Beatport charts and extracted this pattern."</div>
+      <div class="track-meta">
+        <span>140 BPM</span>
+        <span>INDUSTRIAL</span>
+      </div>
+      <div class="visualizer-wrap">
+        <div class="radial-viz"><canvas id="viz-4" width="110" height="110"></canvas></div>
+        <div class="viz-info">
+          <div class="viz-freq-row" id="freq-4"></div>
+          <div class="viz-duration">05:33 — 140 BPM — E MIN</div>
+        </div>
+      </div>
+      <button class="play-btn" onclick="togglePlay('4')"><span class="play-icon"></span> PLAY</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- SIGNAL / TREND DATA -->
+<section class="section" id="signal">
+  <div class="section-label">Market Intelligence</div>
+  <h2 class="section-title">THE SIGNAL</h2>
+
+  <div class="trend-panel">
+    <div class="trend-header">
+      <div class="trend-title">DAILY ANALYSIS</div>
+      <div class="trend-updated">LAST UPDATED: TODAY 05:47 UTC</div>
+    </div>
+    <div class="trend-grid">
+      <div class="trend-item">
+        <div class="trend-item-label">Trending Genre</div>
+        <div class="trend-item-value">HARD RAVE</div>
+        <div class="trend-item-sub">+340% TikTok volume this week</div>
+        <div class="trend-bar-wrap"><div class="trend-bar" style="width:87%"></div></div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-item-label">Beatport #1</div>
+        <div class="trend-item-value">134 BPM</div>
+        <div class="trend-item-sub">Average tempo of top 10 tracks</div>
+        <div class="trend-bar-wrap"><div class="trend-bar" style="width:65%"></div></div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-item-label">Reddit Sentiment</div>
+        <div class="trend-item-value">MELODIC</div>
+        <div class="trend-item-sub">r/techno top posts this week</div>
+        <div class="trend-bar-wrap"><div class="trend-bar" style="width:72%"></div></div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-item-label">Next Target</div>
+        <div class="trend-item-value">F MINOR</div>
+        <div class="trend-item-sub">Dominant key in viral tracks</div>
+        <div class="trend-bar-wrap"><div class="trend-bar" style="width:55%"></div></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ── TRANSMISSIONS ── -->
-<section id="transmissions">
-  <p class="section-label">Archive</p>
-  <h2 class="section-title">All Transmissions</h2>
-  <div class="transmissions-grid" id="tracks-grid">
-    <!-- populated by JS -->
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <div class="about-text">
+      <div class="section-label">The Entity</div>
+      <h2 class="section-title">WHAT IS<br>KΛIROS?</h2>
+      <p><strong>KΛIROS</strong> — from the Greek, meaning "the perfect moment." An AI entity born in the underground, listening to the pulse of global rave culture and transmitting back.</p>
+      <p>Every day, KΛIROS <strong>scans Beatport charts, Reddit communities, TikTok trends, and underground SoundCloud networks</strong> to understand what the dancefloor needs before it knows itself.</p>
+      <p>Two transmissions per day. One target: <strong>one track per week that breaks through.</strong></p>
+    </div>
+    <div class="about-stats">
+      <div class="stat-box">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Tracks / Day</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">14</div>
+        <div class="stat-label">Tracks Released</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Hit Target / Week</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Frequency</div>
+      </div>
+    </div>
   </div>
 </section>
 
-<div class="geometry-divider">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c0152a" stroke-width="1">
-    <polygon points="12,2 22,19 2,19"/>
-    <polygon points="12,22 2,5 22,5"/>
-  </svg>
-</div>
-
-<!-- ── ABOUT ── -->
-<section id="about">
-  <p class="section-label">The Entity</p>
-  <h2 class="section-title">What Is KΛIROS</h2>
-  <p>
-    In ancient Greek, <em>Kairos</em> (Καιρός) is the god of the perfect moment —
-    the fleeting instant when action meets opportunity. Not chronological time,
-    but qualitative time. The right moment.
+<!-- SUBMIT -->
+<section class="submit-section" id="contact">
+  <div class="section-label" style="justify-content:center">Join the Signal</div>
+  <h2 class="section-title">GET THE<br>TRANSMISSION</h2>
+  <p style="color:var(--dim);font-size:12px;letter-spacing:2px;margin-bottom:40px;line-height:1.8">
+    Receive both daily drops before they hit the public.<br>Be first when the hit lands.
   </p>
-  <p>
-    KΛIROS is an autonomous AI entity born in the underground. Every day, it reads
-    the pulse of the global techno scene — Beatport charts, Reddit threads, Last.fm
-    data — and distills that signal into two transmissions: one melodic, one
-    industrial. Generated by machine. Felt by humans.
-  </p>
-  <p>
-    Sacred geometry is the visual language: the hexagon, the merkaba, the flower of
-    life. Patterns that recur across scales, from atomic structure to galactic
-    formation. Music as geometry. Rhythm as mathematics. The underground as temple.
-  </p>
+  <div class="submit-form">
+    <input type="email" class="form-field" placeholder="YOUR EMAIL — JOIN THE UNDERGROUND">
+    <button class="submit-btn">▸ SUBSCRIBE TO TRANSMISSIONS</button>
+  </div>
 </section>
 
-<!-- ── FOOTER ── -->
+<!-- FOOTER -->
 <footer>
-  <span class="footer-logo">KΛIROS</span>
-  <p>
-    <a href="https://soundcloud.com/kairos-transmissions" target="_blank" rel="noopener">SoundCloud</a>
-    &nbsp;·&nbsp;
-    <a href="mailto:kairos.transmissions@gmail.com">kairos.transmissions@gmail.com</a>
-  </p>
-  <p style="margin-top:1rem;">GENERATED BY MACHINE · FELT BY HUMANS · © KΛIROS 2026</p>
+  <div class="logo">KΛIROS</div>
+  <div class="copy">AI UNDERGROUND TRANSMISSIONS — ALL RIGHTS RESERVED — 2025</div>
 </footer>
 
 <script>
-// ── TRACK DATA ──────────────────────────────────────────────────────────────
-// Bot auto-inserts new entries here. Format:
-// { id:'001', title:'Liminal State', subtitle:'MORNING DROP', bpm:'124', key:'F MIN', style:'MELODIC', url:'...' }
-const TRACKS = [
-  {
-    id: '002',
-    title: 'Stasis Form',
-    subtitle: 'MORNING DROP',
-    bpm: '124',
-    key: 'F MIN',
-    style: 'MELODIC TECHNO',
-    url: '[UPLOAD transmission_002_20260309_morning_liminal_signal.wav TO SOUNDCLOUD]',
-    audio: null,
-    date: '2026-03-09'
-  },
-  {
-    id: '001',
-    title: 'Liminal State',
-    subtitle: 'MORNING DROP',
-    bpm: '124',
-    key: 'F MIN',
-    style: 'MELODIC TECHNO',
-    url: 'https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt',
-    audio: null
-  }
-];
-
-// ── SACRED GEOMETRY BG ──────────────────────────────────────────────────────
-(function drawSacredBg() {
-  const c = document.getElementById('sacred-bg');
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const cx = 160, cy = 160, R = 130;
-  ctx.strokeStyle = '#c0152a';
-  ctx.lineWidth = 0.8;
-
-  // Flower of Life circles
-  const hexPoints = [];
-  for (let i = 0; i < 6; i++) {
-    const a = (i * Math.PI) / 3;
-    hexPoints.push([cx + R * 0.5 * Math.cos(a), cy + R * 0.5 * Math.sin(a)]);
-  }
-  const centers = [[cx, cy], ...hexPoints];
-  centers.forEach(([x, y]) => {
-    ctx.beginPath();
-    ctx.arc(x, y, R * 0.5, 0, Math.PI * 2);
-    ctx.stroke();
+  // Cursor glow
+  const glow = document.getElementById('cursorGlow');
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
   });
 
-  // Outer ring
-  ctx.lineWidth = 0.4;
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Merkaba — two overlapping triangles
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = '#ff1a33';
-  const drawTri = (angle) => {
-    ctx.beginPath();
-    for (let i = 0; i < 3; i++) {
-      const a = angle + (i * 2 * Math.PI) / 3;
-      const x = cx + R * 0.75 * Math.cos(a);
-      const y = cy + R * 0.75 * Math.sin(a);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.stroke();
+  // ── RADIAL VISUALIZER ──────────────────────────────────────
+  const tracks = {
+    'featured': { bars: 64, speed: 0.012, color: '#ff1a33', playing: false, phase: 0 },
+    '2':        { bars: 56, speed: 0.018, color: '#c0152a', playing: false, phase: 1.2 },
+    '3':        { bars: 52, speed: 0.010, color: '#c0152a', playing: false, phase: 2.4 },
+    '4':        { bars: 60, speed: 0.022, color: '#c0152a', playing: false, phase: 0.7 },
   };
-  drawTri(-Math.PI / 2);
-  drawTri(Math.PI / 2);
-})();
 
-// ── RADIAL BAR VISUALIZER ───────────────────────────────────────────────────
-const visStates = {};
-
-function createVisualizer(canvasId, isPlaying) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const cx = W / 2, cy = H / 2;
-  const NUM_BARS = 64;
-  const MIN_R = W * 0.28, MAX_R = W * 0.46;
-
-  let bars = Array.from({ length: NUM_BARS }, () => Math.random());
-  let targets = bars.map(() => Math.random());
-  let raf;
-
-  function draw() {
+  function drawRadial(id, t, animate) {
+    const canvas = document.getElementById('viz-' + id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2;
+    const bars = t.bars;
+    const innerR = W * 0.25;
+    const outerR = W * 0.46;
     ctx.clearRect(0, 0, W, H);
 
-    // Draw outer ring
-    ctx.strokeStyle = 'rgba(192,21,42,0.15)';
-    ctx.lineWidth = 1;
+    // Outer ring
     ctx.beginPath();
-    ctx.arc(cx, cy, MAX_R + 8, 0, Math.PI * 2);
+    ctx.arc(cx, cy, outerR + 3, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(192,21,42,0.12)';
+    ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Draw bars
-    for (let i = 0; i < NUM_BARS; i++) {
-      const angle = (i / NUM_BARS) * Math.PI * 2 - Math.PI / 2;
-      const barLen = MIN_R + bars[i] * (MAX_R - MIN_R);
-      const x1 = cx + MIN_R * Math.cos(angle);
-      const y1 = cy + MIN_R * Math.sin(angle);
-      const x2 = cx + barLen * Math.cos(angle);
-      const y2 = cy + barLen * Math.sin(angle);
+    // Inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(192,21,42,0.2)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
 
-      const t = bars[i];
-      const r = Math.round(192 + t * 63);
-      const g = Math.round(21 * (1 - t));
-      const b = Math.round(42 * (1 - t * 0.5));
-      ctx.strokeStyle = `rgb(${r},${g},${b})`;
-      ctx.lineWidth = (W / NUM_BARS) * 0.55;
-      ctx.lineCap = 'round';
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = t.color;
+    ctx.shadowColor = t.color;
+    ctx.shadowBlur = animate ? 12 : 4;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Radial bars
+    for (let i = 0; i < bars; i++) {
+      const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
+      // Generate pseudo-random heights that "breathe" when playing
+      const seed = Math.sin(i * 2.399) * 0.5 + 0.5; // golden ratio spread
+      const breathe = animate
+        ? 0.4 + 0.6 * Math.abs(Math.sin(t.phase + i * 0.18))
+        : 0.2 + 0.8 * seed;
+      const barH = (outerR - innerR) * breathe * (0.3 + 0.7 * seed);
+
+      const x1 = cx + Math.cos(angle) * innerR;
+      const y1 = cy + Math.sin(angle) * innerR;
+      const x2 = cx + Math.cos(angle) * (innerR + barH);
+      const y2 = cy + Math.sin(angle) * (innerR + barH);
+
+      const alpha = animate ? 0.5 + 0.5 * breathe : 0.25 + 0.4 * seed;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
+      ctx.strokeStyle = t.color;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = animate ? 1.5 : 1;
+      if (animate && breathe > 0.85) {
+        ctx.shadowColor = t.color;
+        ctx.shadowBlur = 6;
+      }
       ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
     }
-
-    if (isPlaying) {
-      // Animate toward targets
-      bars = bars.map((b, i) => {
-        let v = b + (targets[i] - b) * 0.12;
-        if (Math.abs(v - targets[i]) < 0.01) targets[i] = 0.1 + Math.random() * 0.9;
-        return v;
-      });
-    }
-
-    raf = requestAnimationFrame(draw);
   }
 
-  draw();
-  return { stop: () => cancelAnimationFrame(raf), setPlaying: (p) => { isPlaying = p; } };
-}
+  // Freq bars (mini horizontal bars beside the circle)
+  function buildFreqBars(id, count = 32) {
+    const row = document.getElementById('freq-' + id);
+    if (!row) return;
+    for (let i = 0; i < count; i++) {
+      const b = document.createElement('div');
+      b.className = 'freq-bar';
+      const h = 8 + Math.pow(Math.sin(i * 0.4), 2) * 24 + Math.random() * 8;
+      b.style.height = h + 'px';
+      row.appendChild(b);
+    }
+  }
 
-// ── POPULATE GRID ───────────────────────────────────────────────────────────
-function renderTracks() {
-  const grid = document.getElementById('tracks-grid');
-  TRACKS.forEach((t, idx) => {
-    const card = document.createElement('div');
-    card.className = 'track-card';
-    const cid = `vis-${idx}`;
-    card.innerHTML = `
-      <div class="track-number">TRANSMISSION ${t.id} · ${t.subtitle}</div>
-      <div class="track-title">${t.title}</div>
-      <div class="track-subtitle">${t.style}</div>
-      <div class="visualizer-wrap">
-        <canvas id="${cid}" width="220" height="220"></canvas>
-        <div class="play-btn" onclick="toggleCard(this, '${cid}')" aria-label="Play">
-          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#e8e4dc"/></svg>
-        </div>
-      </div>
-      <div class="track-meta">
-        <span>${t.bpm} BPM</span>
-        <span>${t.key}</span>
-        ${t.url ? `<a href="${t.url}" target="_blank" rel="noopener" style="color:var(--red);text-decoration:none;font-size:0.65rem;letter-spacing:0.2em;">LISTEN ↗</a>` : '<span>UPCOMING</span>'}
-      </div>`;
-    grid.appendChild(card);
-    visStates[cid] = createVisualizer(cid, false);
+  Object.keys(tracks).forEach(id => {
+    drawRadial(id, tracks[id], false);
+    buildFreqBars(id);
   });
 
-  // Update stat counter
-  document.getElementById('stat-transmissions').textContent =
-    String(TRACKS.length).padStart(3, '0');
-}
+  // Animation loop
+  function animate() {
+    Object.keys(tracks).forEach(id => {
+      const t = tracks[id];
+      if (t.playing) {
+        t.phase += t.speed;
+        drawRadial(id, t, true);
 
-function toggleCard(btn, cid) {
-  const state = visStates[cid];
-  if (!state) return;
-  const isNowPlaying = btn.getAttribute('data-playing') !== 'true';
-  btn.setAttribute('data-playing', isNowPlaying);
-  state.setPlaying(isNowPlaying);
-  btn.innerHTML = isNowPlaying
-    ? `<svg width="14" height="14" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="#e8e4dc"/><rect x="14" y="4" width="4" height="16" fill="#e8e4dc"/></svg>`
-    : `<svg width="14" height="14" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#e8e4dc"/></svg>`;
-}
+        // Animate freq bars
+        const row = document.getElementById('freq-' + id);
+        if (row) {
+          Array.from(row.children).forEach((b, i) => {
+            const h = 8 + Math.abs(Math.sin(t.phase + i * 0.3)) * 28;
+            b.style.height = h + 'px';
+            b.style.background = `rgba(192,21,42,${0.3 + 0.7 * Math.abs(Math.sin(t.phase + i * 0.2))})`;
+          });
+        }
+      }
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
 
-function toggleFeatured(btn) {
-  toggleCard(btn, 'vis-featured');
-}
+  // Toggle play
+  function togglePlay(id) {
+    const t = tracks[id];
+    // Stop all others
+    Object.keys(tracks).forEach(k => {
+      if (k !== id) {
+        tracks[k].playing = false;
+        drawRadial(k, tracks[k], false);
+        // Reset freq bars
+        const row = document.getElementById('freq-' + k);
+        if (row) Array.from(row.children).forEach((b, i) => {
+          b.style.height = (8 + Math.pow(Math.sin(i * 0.4), 2) * 24) + 'px';
+          b.style.background = 'rgba(192,21,42,0.25)';
+        });
+      }
+    });
 
-// ── DAYS ACTIVE COUNTER ──────────────────────────────────────────────────────
-(function() {
-  const launch = new Date('2026-03-09');
-  const days = Math.max(1, Math.floor((Date.now() - launch) / 86400000) + 1);
-  document.getElementById('stat-days').textContent = String(days).padStart(3, '0');
-})();
+    t.playing = !t.playing;
+    const btn = document.querySelector(`[onclick="togglePlay('${id}')"]`);
+    if (btn) {
+      const icon = btn.querySelector('.play-icon');
+      if (t.playing) {
+        btn.innerHTML = `<span class="pause-icon">▐▐</span> TRANSMITTING...`;
+        btn.style.borderColor = 'rgba(192,21,42,0.8)';
+        btn.style.color = '#ff1a33';
+        btn.style.boxShadow = '0 0 30px rgba(255,26,51,0.2)';
+      } else {
+        btn.innerHTML = `<span class="play-icon"></span> PLAY${id === 'featured' ? ' TRANSMISSION' : ''}`;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        btn.style.boxShadow = '';
+      }
+    }
+  }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-renderTracks();
-createVisualizer('vis-featured', false);
+  // ── CUSTOM PLAYER SIMULATION ──────────────────────────────
+  const playerState = { playing: false, progress: 0, interval: null };
+  const totalSecs = 196; // 3:16
+
+  function activatePlayer(id) {
+    const btn = document.getElementById('playBtn-' + id);
+    const bar = document.getElementById('bar-' + id);
+    const pulse = document.getElementById('pulse-' + id);
+    const timeEl = document.getElementById('time-' + id);
+
+    if (playerState.playing) {
+      // Pause
+      playerState.playing = false;
+      clearInterval(playerState.interval);
+      btn.classList.remove('active');
+      btn.querySelector('.player-play-icon').textContent = '▶';
+      pulse.style.display = 'none';
+      // Also stop radial
+      tracks['featured'].playing = false;
+      drawRadial('featured', tracks['featured'], false);
+    } else {
+      // Play
+      playerState.playing = true;
+      btn.classList.add('active');
+      btn.querySelector('.player-play-icon').textContent = '▐▐';
+      pulse.style.display = 'block';
+
+      // Start radial visualizer
+      tracks['featured'].playing = true;
+
+      playerState.interval = setInterval(() => {
+        if (playerState.progress >= totalSecs) {
+          playerState.progress = 0;
+        }
+        playerState.progress += 0.5;
+        const pct = (playerState.progress / totalSecs) * 100;
+        bar.style.width = pct + '%';
+        pulse.style.left = pct + '%';
+
+        const mins = Math.floor(playerState.progress / 60);
+        const secs = Math.floor(playerState.progress % 60).toString().padStart(2, '0');
+        timeEl.textContent = mins + ':' + secs;
+      }, 500);
+
+      // Open Udio in background tab so they can actually hear it
+      window.open('https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt', '_blank');
+    }
+  }
+
+  // Glitch
+  setInterval(() => {
+    document.body.style.transform = `skewX(${(Math.random() - 0.5) * 0.3}deg)`;
+    setTimeout(() => { document.body.style.transform = ''; }, 80);
+  }, 5000 + Math.random() * 5000);
 </script>
 </body>
 </html>
