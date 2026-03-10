@@ -1,0 +1,22 @@
+[
+  {
+    "drop_type": "morning",
+    "title": "Stasis Form",
+    "bpm": 124,
+    "key": "F minor",
+    "style": "Melodic Techno",
+    "prompt": "A 124 BPM melodic techno track in F minor. Hypnotic, cosmic, and transcendent atmosphere. Features shimmering pad washes, rolling four-on-the-floor kick, deep melodic bassline, and cinematic string stabs. Inspired by Agents Of Time and Kiasmos. Slow build over 8 bars. No lyrics except one whispered phrase buried deep in reverb. Suitable for a Berlin underground after-hours set. Sacred geometry energy — mathematical, meditative, hypnotic.",
+    "negative_prompt": "No commercial pop elements. No happy chord progressions. No major key. No vocals or singing. No EDM drops. No mainstream festival sounds.",
+    "track_number": 2
+  },
+  {
+    "drop_type": "evening",
+    "title": "Cascade Protocol",
+    "bpm": 134,
+    "key": "A minor",
+    "style": "Industrial Techno",
+    "prompt": "A 134 BPM peak-time industrial techno track in A minor. Relentless, unforgiving, and driving energy. Features distorted acid bass, metallic percussion hits, dark atmospheric drone, and punishing kick drum with distorted clap. Inspired by Truncate and Industrialyzer. Hard, pounding, relentless. Built for peak-time warehouse raving. No breakdowns — pure momentum. Machine precision with human aggression. Dark Berlin underground energy.",
+    "negative_prompt": "No melody. No pleasant harmony. No pop elements. No soft sounds. No vocals. No uplifting moments.",
+    "track_number": 3
+  }
+]

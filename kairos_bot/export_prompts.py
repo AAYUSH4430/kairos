@@ -82,6 +82,40 @@ def main():
     print("  Copy the prompt into the Colab notebook to generate audio.")
     print("=" * 60 + "\n")
 
+    # Send email if credentials are configured
+    email_user = os.getenv("GMAIL_USER")
+    email_pass = os.getenv("GMAIL_APP_PASSWORD")
+    if email_user and email_pass:
+        _send_email(email_user, email_pass, output)
+    else:
+        print("  (Email not configured — set GMAIL_USER and GMAIL_APP_PASSWORD in .env to enable)")
+
+
+def _send_email(gmail_user: str, app_password: str, prompts: list) -> None:
+    import smtplib
+    from email.mime.text import MIMEText
+
+    lines = ["KΛIROS — Today's Prompts\n"]
+    for p in prompts:
+        lines.append(f"[{p['drop_type'].upper()} DROP] — {p['title']}")
+        lines.append(f"  {p['bpm']} BPM · {p['key']} · {p['style']}\n")
+        lines.append(f"PROMPT:\n{p['prompt']}\n")
+        lines.append("-" * 50)
+
+    body = "\n".join(lines)
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = f"KΛIROS Prompts Ready — {datetime.date.today()}"
+    msg["From"]    = gmail_user
+    msg["To"]      = gmail_user
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(gmail_user, app_password)
+            smtp.send_message(msg)
+        print(f"  Email sent to {gmail_user}")
+    except Exception as e:
+        print(f"  Email failed: {e}")
+
 
 if __name__ == "__main__":
     main()
