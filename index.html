@@ -1133,6 +1133,19 @@
 </head>
 <body>
 
+<!-- SOUNDCLOUD WIDGET API -->
+<script src="https://w.soundcloud.com/player/api.js"></script>
+
+<!-- Hidden SC iframes — swap URLs once tracks are on SoundCloud -->
+<div style="display:none" aria-hidden="true">
+  <iframe id="sc-featured" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https://soundcloud.com/kairos-transmissions/liminal-state&auto_play=false&buying=false&liking=false&download=false&sharing=false&show_artwork=false&show_comments=false&show_playcount=false&show_user=false&hide_related=true&visual=false&callback=true"></iframe>
+  <iframe id="sc-2" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https://soundcloud.com/kairos-transmissions/stasis-form&auto_play=false&buying=false&liking=false&download=false&sharing=false&show_artwork=false&show_comments=false&show_playcount=false&show_user=false&hide_related=true&visual=false&callback=true"></iframe>
+  <iframe id="sc-3" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https://soundcloud.com/kairos-transmissions/cascade-protocol&auto_play=false&buying=false&liking=false&download=false&sharing=false&show_artwork=false&show_comments=false&show_playcount=false&show_user=false&hide_related=true&visual=false&callback=true"></iframe>
+</div>
+
 <!-- BOOT SCREEN -->
 <div id="boot-screen">
   <div class="boot-logo">KΛIROS</div>
@@ -1321,7 +1334,23 @@
           <div class="viz-duration">124 BPM — F MIN — TRANSMISSION 002</div>
         </div>
       </div>
-      <a href="https://www.udio.com/songs/6aUR9Dm6PsysGZo9L59YgJ" target="_blank" class="play-btn" style="text-decoration:none">▶ LISTEN ON UDIO ↗</a>
+      <div class="custom-player" id="player-2" style="margin-top:16px">
+        <div class="player-left">
+          <button class="player-play-btn" id="playBtn-2" onclick="activatePlayer('2')">
+            <span class="player-play-icon">▶</span>
+          </button>
+        </div>
+        <div class="player-middle">
+          <div class="player-title">STASIS FORM — TRANSMISSION 002</div>
+          <div class="player-bar-wrap">
+            <div class="player-bar" id="bar-2"></div>
+            <div class="player-bar-pulse" id="pulse-2"></div>
+          </div>
+          <div class="player-times">
+            <span id="time-2">0:00</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TRACK 3 -->
@@ -1342,7 +1371,23 @@
           <div class="viz-duration">134 BPM — A MIN — TRANSMISSION 003</div>
         </div>
       </div>
-      <a href="https://www.udio.com/songs/wHSbSXu2BnRpMXNNuWroA5" target="_blank" class="play-btn" style="text-decoration:none">▶ LISTEN ON UDIO ↗</a>
+      <div class="custom-player" id="player-3" style="margin-top:16px">
+        <div class="player-left">
+          <button class="player-play-btn" id="playBtn-3" onclick="activatePlayer('3')">
+            <span class="player-play-icon">▶</span>
+          </button>
+        </div>
+        <div class="player-middle">
+          <div class="player-title">CASCADE PROTOCOL — TRANSMISSION 003</div>
+          <div class="player-bar-wrap">
+            <div class="player-bar" id="bar-3"></div>
+            <div class="player-bar-pulse" id="pulse-3"></div>
+          </div>
+          <div class="player-times">
+            <span id="time-3">0:00</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TRACK 4 -->
@@ -1615,52 +1660,83 @@
     }
   }
 
-  // ── CUSTOM PLAYER SIMULATION ──────────────────────────────
-  const playerState = { playing: false, progress: 0, interval: null };
-  const totalSecs = 196; // 3:16
+  // ── SOUNDCLOUD WIDGET PLAYER ──────────────────────────────
+  const scWidgets = {};
+  const scReady = {};
+
+  function initWidget(id) {
+    const iframe = document.getElementById('sc-' + id);
+    if (!iframe || scWidgets[id]) return;
+    const widget = SC.Widget(iframe);
+    scWidgets[id] = widget;
+
+    widget.bind(SC.Widget.Events.READY, () => {
+      scReady[id] = true;
+    });
+
+    widget.bind(SC.Widget.Events.PLAY_PROGRESS, (e) => {
+      const bar   = document.getElementById('bar-' + id);
+      const pulse = document.getElementById('pulse-' + id);
+      const timeEl= document.getElementById('time-' + id);
+      if (!bar) return;
+      widget.getDuration(dur => {
+        const pct = (e.currentPosition / dur) * 100;
+        bar.style.width = pct + '%';
+        if (pulse) pulse.style.left = pct + '%';
+        if (timeEl) {
+          const s = Math.floor(e.currentPosition / 1000);
+          timeEl.textContent = Math.floor(s/60) + ':' + (s%60).toString().padStart(2,'0');
+        }
+      });
+    });
+
+    widget.bind(SC.Widget.Events.FINISH, () => {
+      tracks[id === 'featured' ? 'featured' : id].playing = false;
+      const btn = document.getElementById('playBtn-' + id);
+      if (btn) { btn.classList.remove('active'); btn.querySelector('.player-play-icon').textContent = '▶'; }
+      const pulse = document.getElementById('pulse-' + id);
+      if (pulse) pulse.style.display = 'none';
+    });
+  }
+
+  ['featured', '2', '3'].forEach(initWidget);
 
   function activatePlayer(id) {
-    const btn = document.getElementById('playBtn-' + id);
-    const bar = document.getElementById('bar-' + id);
+    const btn   = document.getElementById('playBtn-' + id);
     const pulse = document.getElementById('pulse-' + id);
-    const timeEl = document.getElementById('time-' + id);
+    const trackId = id === 'featured' ? 'featured' : id;
 
-    if (playerState.playing) {
+    if (!scWidgets[id]) { initWidget(id); }
+    const widget = scWidgets[id];
+    if (!widget) return;
+
+    if (tracks[trackId] && tracks[trackId].playing) {
       // Pause
-      playerState.playing = false;
-      clearInterval(playerState.interval);
+      widget.pause();
+      tracks[trackId].playing = false;
       btn.classList.remove('active');
       btn.querySelector('.player-play-icon').textContent = '▶';
-      pulse.style.display = 'none';
-      // Also stop radial
-      tracks['featured'].playing = false;
-      drawRadial('featured', tracks['featured'], false);
+      if (pulse) pulse.style.display = 'none';
+      drawRadial(trackId, tracks[trackId], false);
     } else {
+      // Stop all other widgets first
+      ['featured', '2', '3'].forEach(k => {
+        if (k !== id && scWidgets[k]) scWidgets[k].pause();
+        const tid = k === 'featured' ? 'featured' : k;
+        if (tracks[tid]) tracks[tid].playing = false;
+        const b = document.getElementById('playBtn-' + k);
+        if (b) { b.classList.remove('active'); const pi = b.querySelector('.player-play-icon'); if (pi) pi.textContent = '▶'; }
+        const p = document.getElementById('pulse-' + k);
+        if (p) p.style.display = 'none';
+      });
+
       // Play
-      playerState.playing = true;
+      widget.play();
+      tracks[trackId].playing = true;
       btn.classList.add('active');
       btn.querySelector('.player-play-icon').textContent = '▐▐';
-      pulse.style.display = 'block';
-
-      // Start radial visualizer
-      tracks['featured'].playing = true;
-
-      playerState.interval = setInterval(() => {
-        if (playerState.progress >= totalSecs) {
-          playerState.progress = 0;
-        }
-        playerState.progress += 0.5;
-        const pct = (playerState.progress / totalSecs) * 100;
-        bar.style.width = pct + '%';
-        pulse.style.left = pct + '%';
-
-        const mins = Math.floor(playerState.progress / 60);
-        const secs = Math.floor(playerState.progress % 60).toString().padStart(2, '0');
-        timeEl.textContent = mins + ':' + secs;
-      }, 500);
-
-      // Open Udio in background tab so they can actually hear it
-      window.open('https://www.udio.com/songs/fNutHHk615Cb87tb7NtCjt', '_blank');
+      if (pulse) pulse.style.display = 'block';
+      drawRadial(trackId, tracks[trackId], true);
     }
   }
 
