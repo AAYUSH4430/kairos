@@ -869,6 +869,7 @@
     background: rgba(255,255,255,0.06);
     position: relative;
     cursor: pointer;
+    cursor: pointer;
     margin-bottom: 6px;
   }
 
@@ -1700,6 +1701,20 @@
   }
 
   ['featured', '2', '3'].forEach(initWidget);
+
+  // ── SEEK ON CLICK ──────────────────────────────────────────
+  ['featured', '2', '3'].forEach(id => {
+    const wrap = document.querySelector(`#player-${id} .player-bar-wrap`);
+    if (!wrap) return;
+    wrap.addEventListener('click', e => {
+      const widget = scWidgets[id];
+      if (!widget) return;
+      const pct = e.offsetX / wrap.offsetWidth;
+      widget.getDuration(dur => {
+        widget.seekTo(pct * dur);
+      });
+    });
+  });
 
   function activatePlayer(id) {
     const btn   = document.getElementById('playBtn-' + id);
