@@ -865,31 +865,41 @@
   }
 
   .player-bar-wrap {
-    height: 3px;
+    height: 12px;
     background: rgba(255,255,255,0.06);
     position: relative;
-    cursor: pointer;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    align-items: center;
     cursor: pointer;
     margin-bottom: 6px;
   }
 
   .player-bar {
-    height: 100%;
+    height: 3px;
     background: var(--red);
     width: 0%;
-    transition: width 0.5s linear;
+    transition: width 0.1s linear;
     box-shadow: 0 0 8px var(--red);
+    pointer-events: none;
   }
+
+  .player-bar-wrap:active { cursor: grabbing; }
 
   .player-bar-pulse {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
-    width: 8px;
-    height: 8px;
+    transform: translateY(-50%) scale(1);
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    background: var(--red-glow);
+    background: #fff;
+    border: 2px solid var(--red-glow);
+    box-shadow: 0 0 8px var(--red-glow);
     left: 0%;
+    transition: transform 0.1s;
+    pointer-events: none;
     transition: left 0.5s linear;
     box-shadow: 0 0 10px var(--red-glow);
     display: none;
@@ -1702,18 +1712,34 @@
 
   ['featured', '2', '3'].forEach(initWidget);
 
-  // ── SEEK ON CLICK ──────────────────────────────────────────
+  // ── SEEK: CLICK + DRAG ─────────────────────────────────────
   ['featured', '2', '3'].forEach(id => {
     const wrap = document.querySelector(`#player-${id} .player-bar-wrap`);
     if (!wrap) return;
-    wrap.addEventListener('click', e => {
+
+    let dragging = false;
+
+    function seekTo(e) {
       const widget = scWidgets[id];
       if (!widget) return;
-      const pct = e.offsetX / wrap.offsetWidth;
-      widget.getDuration(dur => {
-        widget.seekTo(pct * dur);
-      });
-    });
+      const rect = wrap.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const pct = Math.min(Math.max(x / rect.width, 0), 1);
+      // Update UI instantly
+      const bar = document.getElementById('bar-' + id);
+      const pulse = document.getElementById('pulse-' + id);
+      if (bar) bar.style.width = (pct * 100) + '%';
+      if (pulse) pulse.style.left = (pct * 100) + '%';
+      // Seek audio
+      widget.getDuration(dur => { widget.seekTo(pct * dur); });
+    }
+
+    wrap.addEventListener('mousedown',  e => { dragging = true; seekTo(e); });
+    wrap.addEventListener('touchstart', e => { dragging = true; seekTo(e); }, { passive: true });
+    document.addEventListener('mousemove',  e => { if (dragging) seekTo(e); });
+    document.addEventListener('touchmove',  e => { if (dragging) seekTo(e); }, { passive: true });
+    document.addEventListener('mouseup',  () => { dragging = false; });
+    document.addEventListener('touchend', () => { dragging = false; });
   });
 
   function activatePlayer(id) {
